@@ -14,6 +14,9 @@ public class DeliveryAttempt {
     @Column(nullable = false)
     private Integer attemptNumber;
 
+    @Column(nullable = false, length = 20)
+    private String status;
+
     private Integer responseCode;
 
     @Column(columnDefinition = "TEXT")
@@ -42,6 +45,14 @@ public class DeliveryAttempt {
     public Integer getAttemptNumber() { return attemptNumber; }
     public void setAttemptNumber(Integer attemptNumber) {
         this.attemptNumber = attemptNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Integer getResponseCode() { return responseCode; }

@@ -7,6 +7,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.hookflow.entity.DeliveryAttempt;
+import com.hookflow.repository.DeliveryAttemptRepository;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -14,13 +17,16 @@ public class WebhookDeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final WebClient webClient;
+    private final DeliveryAttemptRepository deliveryAttemptRepository;
 
     public WebhookDeliveryService(
             DeliveryRepository deliveryRepository,
-            WebClient webClient
+            WebClient webClient,
+            DeliveryAttemptRepository deliveryAttemptRepository
     ) {
         this.deliveryRepository = deliveryRepository;
         this.webClient = webClient;
+        this.deliveryAttemptRepository = deliveryAttemptRepository;
     }
 
     @Async
@@ -35,29 +41,44 @@ public class WebhookDeliveryService {
         delivery.setAttemptCount(delivery.getAttemptCount() + 1);
         deliveryRepository.save(delivery);
 
+        DeliveryAttempt attempt = new DeliveryAttempt();
+        attempt.setAttemptNumber(delivery.getAttemptCount());
+        attempt.setDelivery(delivery);
+
         try {
 
             Integer responseCode = webClient.post()
                     .uri(delivery.getWebhookEndpoint().getUrl())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(delivery.getEvent().getPayload())
-                    .exchangeToMono(response ->
-                            response.releaseBody()
-                                    .thenReturn(response.statusCode().value())
-                    )
+                    .exchangeToMono(response -> {
+
+                        int statusCode = response.statusCode().value();
+
+                        return response.bodyToMono(String.class)
+                                .defaultIfEmpty("")
+                                .map(body -> {
+                                    attempt.setResponseBody(body);
+                                    attempt.setResponseCode(statusCode);
+                                    return statusCode;
+                                });
+                    })
                     .block();
 
             delivery.setLastResponseCode(responseCode);
 
-            delivery.setLastResponseCode(responseCode);
-
             if (responseCode >= 200 && responseCode < 300) {
+
+                attempt.setStatus("SUCCESS");
 
                 delivery.setStatus("DELIVERED");
                 delivery.setLastError(null);
                 delivery.setNextRetryAt(null);
 
             } else {
+
+                attempt.setStatus("FAILED");
+                attempt.setErrorMessage("HTTP " + responseCode);
 
                 delivery.setLastError("HTTP " + responseCode);
 
@@ -68,16 +89,24 @@ public class WebhookDeliveryService {
                 }
             }
 
-
         } catch (Exception exception) {
 
-            delivery.setLastError(exception.getMessage());
+            String errorMessage = exception.getMessage();
+
+            if (errorMessage == null || errorMessage.isBlank()) {
+                errorMessage = exception.getClass().getSimpleName();
+            }
+
+            attempt.setStatus("FAILED");
+            attempt.setErrorMessage(errorMessage);
+
+            delivery.setLastError(errorMessage);
 
             scheduleRetry(delivery);
-
         }
 
         deliveryRepository.save(delivery);
+        deliveryAttemptRepository.save(attempt);
     }
 
     private void scheduleRetry(Delivery delivery) {
