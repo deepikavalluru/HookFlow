@@ -10,4 +10,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByUser_Id(Long userId);
 
     Optional<Event> findByIdAndUser_Id(Long eventId, Long userId);
+
+    long countByUser_Id(Long userId);
 }

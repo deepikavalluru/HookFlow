@@ -68,4 +68,17 @@ public class DeliveryController {
                 deliveryService.getDeliveryAttempts(id, userId)
         );
     }
+
+    @PostMapping("/{id}/retry")
+    public ResponseEntity<String> retryDelivery(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+
+        deliveryService.retryDelivery(id, userId);
+
+        return ResponseEntity.accepted()
+                .body("Delivery retry initiated");
+    }
 }

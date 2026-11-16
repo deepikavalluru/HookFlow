@@ -39,6 +39,8 @@ public class WebhookDeliveryService {
                 );
 
         delivery.setAttemptCount(delivery.getAttemptCount() + 1);
+        delivery.setRetryCount(delivery.getRetryCount() + 1);
+
         deliveryRepository.save(delivery);
 
         DeliveryAttempt attempt = new DeliveryAttempt();
@@ -111,7 +113,7 @@ public class WebhookDeliveryService {
 
     private void scheduleRetry(Delivery delivery) {
 
-        int attempts = delivery.getAttemptCount();
+        int attempts = delivery.getRetryCount();
 
         if (attempts >= 5) {
             delivery.setStatus("FAILED");

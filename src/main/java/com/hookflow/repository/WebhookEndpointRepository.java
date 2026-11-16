@@ -17,4 +17,6 @@ public interface WebhookEndpointRepository
             Long userId,
             String eventType
     );
+
+    long countByUser_Id(Long userId);
 }

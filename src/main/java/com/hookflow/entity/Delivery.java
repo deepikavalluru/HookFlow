@@ -24,6 +24,9 @@ public class Delivery {
     @Column(nullable = false)
     private Integer attemptCount = 0;
 
+    @Column(nullable = false)
+    private Integer retryCount = 0;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -75,6 +78,14 @@ public class Delivery {
 
     public void setAttemptCount(Integer attemptCount) {
         this.attemptCount = attemptCount;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
