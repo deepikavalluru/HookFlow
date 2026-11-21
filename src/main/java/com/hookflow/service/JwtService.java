@@ -23,6 +23,12 @@ public class JwtService {
             @Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration-ms}") long expirationMs) {
 
+        /*System.out.println("Injected secret length: " + secret.length());
+        System.out.println("Injected secret contains hyphen: " + secret.contains("-"));
+        System.out.println("Injected secret is standard Base64: "
+                + secret.matches("^[A-Za-z0-9+/]+={0,2}$"));
+        System.out.println("Secret: [" + secret + "]");*/
+
         this.signingKey = Keys.hmacShaKeyFor(
                 Decoders.BASE64.decode(secret)
         );

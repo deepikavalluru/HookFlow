@@ -53,11 +53,20 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Long>> getCurrentUser(
+    public ResponseEntity<UserResponse> getCurrentUser(
             Authentication authentication) {
 
         Long userId = (Long) authentication.getPrincipal();
 
-        return ResponseEntity.ok(Map.of("userId", userId));
+        User user = userService.getUserById(userId);
+
+        UserResponse response = new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

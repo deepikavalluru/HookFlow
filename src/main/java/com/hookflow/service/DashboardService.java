@@ -34,7 +34,7 @@ public class DashboardService {
         return new DashboardResponse(
                 eventRepository.countByUser_Id(userId),
 
-                webhookEndpointRepository.countByUser_Id(userId),
+                webhookEndpointRepository.countByUser_IdAndDeletedFalse(userId),
 
                 deliveryService.getDeliveryStats(userId),
 

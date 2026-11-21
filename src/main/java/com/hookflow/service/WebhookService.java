@@ -59,7 +59,7 @@ public class WebhookService {
     @Transactional(readOnly = true)
     public List<WebhookResponse> getAllWebhooks(Long userId) {
 
-        return webhookRepository.findAllByUser_Id(userId)
+        return webhookRepository.findAllByUser_IdAndDeletedFalse(userId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -114,13 +114,15 @@ public class WebhookService {
 
         WebhookEndpoint endpoint = getOwnedWebhook(id, userId);
 
-        webhookRepository.delete(endpoint);
+        endpoint.setDeleted(true);
+        endpoint.setActive(false);
+
+        webhookRepository.save(endpoint);
     }
 
     // Check ownership
     private WebhookEndpoint getOwnedWebhook(Long id, Long userId) {
-
-        return webhookRepository.findByIdAndUser_Id(id, userId)
+        return webhookRepository.findByIdAndUser_IdAndDeletedFalse(id, userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Webhook endpoint not found"));
     }

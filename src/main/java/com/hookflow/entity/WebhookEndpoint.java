@@ -23,6 +23,9 @@ public class WebhookEndpoint {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @Column(nullable = false, length = 100)
     private String eventType;
 
@@ -77,6 +80,14 @@ public class WebhookEndpoint {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public String getEventType() {

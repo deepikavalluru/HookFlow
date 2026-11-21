@@ -1,14 +1,16 @@
 package com.hookflow.service;
 
 import com.hookflow.entity.Delivery;
+import com.hookflow.entity.DeliveryAttempt;
+import com.hookflow.entity.WebhookEndpoint;
 import com.hookflow.repository.DeliveryRepository;
+import com.hookflow.repository.DeliveryAttemptRepository;
+
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.hookflow.entity.DeliveryAttempt;
-import com.hookflow.repository.DeliveryAttemptRepository;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +32,7 @@ public class WebhookDeliveryService {
     }
 
     @Async
+    @Transactional
     public void deliverWebhook(Long deliveryId) {
 
         Delivery delivery = deliveryRepository
@@ -37,6 +40,23 @@ public class WebhookDeliveryService {
                 .orElseThrow(() ->
                         new RuntimeException("Delivery not found")
                 );
+
+        WebhookEndpoint endpoint = delivery.getWebhookEndpoint();
+
+        // Never deliver to inactive or deleted endpoints
+        if (!endpoint.isActive() || endpoint.isDeleted()) {
+
+            delivery.setStatus("FAILED");
+            delivery.setNextRetryAt(null);
+            delivery.setLastError(
+                    endpoint.isDeleted()
+                            ? "Webhook endpoint has been deleted"
+                            : "Webhook endpoint is inactive"
+            );
+
+            deliveryRepository.save(delivery);
+            return;
+        }
 
         delivery.setAttemptCount(delivery.getAttemptCount() + 1);
         delivery.setRetryCount(delivery.getRetryCount() + 1);
@@ -50,7 +70,7 @@ public class WebhookDeliveryService {
         try {
 
             Integer responseCode = webClient.post()
-                    .uri(delivery.getWebhookEndpoint().getUrl())
+                    .uri(endpoint.getUrl())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(delivery.getEvent().getPayload())
                     .exchangeToMono(response -> {

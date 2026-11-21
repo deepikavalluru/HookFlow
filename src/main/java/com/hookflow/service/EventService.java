@@ -58,10 +58,13 @@ public class EventService {
         Event savedEvent = eventRepository.save(event);
 
         // Find matching active endpoints
+        // Find matching active, non-deleted endpoints
         List<WebhookEndpoint> endpoints =
                 webhookEndpointRepository
-                        .findAllByUser_IdAndEventTypeAndActiveTrue(
-                                userId, request.eventType());
+                        .findAllByUser_IdAndEventTypeAndActiveTrueAndDeletedFalse(
+                                userId,
+                                request.eventType()
+                        );
 
         // Create delivery records
         List<Delivery> deliveries = endpoints.stream()

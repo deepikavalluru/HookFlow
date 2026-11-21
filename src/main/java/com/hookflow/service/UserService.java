@@ -3,12 +3,13 @@ package com.hookflow.service;
 import com.hookflow.dto.RegisterRequest;
 import com.hookflow.entity.User;
 import com.hookflow.repository.UserRepository;
+import com.hookflow.exception.EmailAlreadyExistsException;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.hookflow.exception.EmailAlreadyExistsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService {
@@ -38,5 +39,15 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
 
         return userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
+                ));
     }
 }
