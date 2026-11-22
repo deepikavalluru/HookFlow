@@ -46,3 +46,7 @@ build-log.txt
 
 # Local API requests containing authentication tokens
 /src/main/java/com/hookflow/requests.http
+
+# Database backups
+*.dump
+*.backup

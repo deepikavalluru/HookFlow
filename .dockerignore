@@ -1,0 +1,8 @@
+target/
+.git/
+.idea/
+.mvn/
+frontend/
+*.dump
+*.log
+requests.http

@@ -24,7 +24,7 @@ import {
 
 import DashboardLayout from "../layouts/DashboardLayout";
 import dashboardService from "../services/dashboardService";
-import RecentDeliveries from "../components/dashboard/RecentDeliveries";
+import RecentDeliveries from "../components/dashboard/RecentDeliveries.jsx";
 import DashboardSkeleton from "../components/dashboard/DashboardSkeleton";
 import DashboardError from "../components/dashboard/DashboardError";
 
