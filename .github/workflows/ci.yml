@@ -48,6 +48,14 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Verify database configuration
+        run: |
+          echo "Checking database configuration..."
+          test -n "$DB_URL" && echo "DB_URL is configured" || exit 1
+          test -n "$DB_USERNAME" && echo "DB_USERNAME is configured" || exit 1
+          test -n "$DB_PASSWORD" && echo "DB_PASSWORD is configured" || exit 1
+          test -n "$JWT_SECRET" && echo "JWT_SECRET is configured" || exit 1
+
       - name: Run backend tests
         run: mvn -B verify
 
