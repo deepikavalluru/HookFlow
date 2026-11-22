@@ -32,6 +32,7 @@ jobs:
           --health-retries 5
 
     env:
+      SPRING_PROFILES_ACTIVE: test
       DB_TEST_URL: jdbc:postgresql://localhost:5432/hookflow_test
       DB_USERNAME: hookflow_user
       DB_PASSWORD: hookflow_test_password
