@@ -32,7 +32,7 @@ jobs:
           --health-retries 5
 
     env:
-      DB_URL: jdbc:postgresql://localhost:5432/hookflow_test
+      DB_TEST_URL: jdbc:postgresql://localhost:5432/hookflow_test
       DB_USERNAME: postgres
       DB_PASSWORD: deepika2005postgresql@
       JWT_SECRET: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
@@ -51,7 +51,7 @@ jobs:
       - name: Verify database configuration
         run: |
           echo "Checking database configuration..."
-          test -n "$DB_URL" && echo "DB_URL is configured" || exit 1
+          test -n "$DB_TEST_URL" && echo "DB__TEST_URL is configured" || exit 1
           test -n "$DB_USERNAME" && echo "DB_USERNAME is configured" || exit 1
           test -n "$DB_PASSWORD" && echo "DB_PASSWORD is configured" || exit 1
           test -n "$JWT_SECRET" && echo "JWT_SECRET is configured" || exit 1
