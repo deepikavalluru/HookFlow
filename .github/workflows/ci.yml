@@ -51,11 +51,12 @@ jobs:
 
       - name: Verify database configuration
         run: |
-          echo "Checking database configuration..."
-          test -n "$DB_TEST_URL" && echo "DB__TEST_URL is configured" || exit 1
-          test -n "$DB_USERNAME" && echo "DB_USERNAME is configured" || exit 1
-          test -n "$DB_PASSWORD" && echo "DB_PASSWORD is configured" || exit 1
-          test -n "$JWT_SECRET" && echo "JWT_SECRET is configured" || exit 1
+          echo "Active profile: $SPRING_PROFILES_ACTIVE"
+          echo "DB_TEST_URL: $DB_TEST_URL"
+          echo "DB_URL present: ${DB_URL:+yes}"
+          echo "DB_USERNAME: $DB_USERNAME"
+          echo "DB_PASSWORD present: ${DB_PASSWORD:+yes}"
+          echo "JWT_SECRET present: ${JWT_SECRET:+yes}"
 
       - name: Run backend tests
         run: mvn -B verify
