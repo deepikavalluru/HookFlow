@@ -99,8 +99,7 @@ public class SecurityConfig {
                 List.of(
                         "http://localhost:5173",
                         "http://localhost:3000",
-                        "https://hookflow-frontend-five.vercel.app",
-                        "https://hookflow-frontend-44y3qxkb3-deepikavalluru88-7762s-projects.vercel.app"
+                        "https://hookflow-frontend-five.vercel.app"
                 )
         );
 
